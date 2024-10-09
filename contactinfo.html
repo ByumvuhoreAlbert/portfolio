@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Information</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .response-form {
+            display: none; /* Hide the response form initially */
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h2>Contact Information</h2>
+        <div id="contactInfo">
+            <!-- Contact information will be loaded here -->
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- JavaScript to load the data from localStorage -->
+    <script>
+        // Retrieve the contact list data from localStorage
+        const contactListKey = "contactList";
+        let contactList = JSON.parse(localStorage.getItem(contactListKey)) || [];
+
+        // Function to render contacts
+        function renderContacts() {
+            const contactInfoDiv = document.getElementById("contactInfo");
+            contactInfoDiv.innerHTML = ""; // Clear the existing content
+
+            contactList.forEach((contact, index) => {
+                // Create a card for each contact
+                const contactCard = document.createElement("div");
+                contactCard.className = "card mb-3";
+                contactCard.innerHTML = `
+                    <div class="card-body">
+                        <h5 class="card-title">Contact ${index + 1}</h5>
+                        <p><strong>Name:</strong> ${contact.name}</p>
+                        <p><strong>Email:</strong> ${contact.email}</p>
+                        <p><strong>Message:</strong> ${contact.message}</p>
+                        <button class="btn btn-primary" onclick="document.getElementById('response-form-${index}').style.display = 'block'">Respond</button>
+                        <button class="btn btn-danger" onclick="deleteContact(${index})">Delete</button>
+                        
+                        <form id="response-form-${index}" class="response-form" onsubmit="event.preventDefault(); handleResponseSubmit(${index});">
+                            <div class="mb-3">
+                                <label for="response-email-${index}" class="form-label">Your Email:</label>
+                                <input type="email" id="response-email-${index}" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="response-subject-${index}" class="form-label">Subject:</label>
+                                <input type="text" id="response-subject-${index}" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="response-content-${index}" class="form-label">Message:</label>
+                                <textarea id="response-content-${index}" class="form-control" rows="5" required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-success">Send Response</button>
+                        </form>
+                    </div>
+                `;
+                contactInfoDiv.appendChild(contactCard);
+            });
+        }
+
+        // Function to handle the response form submission
+        function handleResponseSubmit(index) {
+            const email = document.getElementById(`response-email-${index}`).value;
+            const subject = document.getElementById(`response-subject-${index}`).value;
+            const content = document.getElementById(`response-content-${index}`).value;
+
+            // Here you can handle the response data (e.g., send it to a server or save it)
+            console.log("Response Data:", { email, subject, content });
+
+            // Clear the response form fields
+            document.getElementById(`response-form-${index}`).reset();
+
+            // Hide the form after submission
+            document.getElementById(`response-form-${index}`).style.display = "none";
+        }
+
+        // Function to delete a contact
+        function deleteContact(index) {
+            // Remove the contact from the array
+            contactList.splice(index, 1);
+            // Update the localStorage
+            localStorage.setItem(contactListKey, JSON.stringify(contactList));
+            // Re-render the contacts
+            renderContacts();
+        }
+
+        // Initial rendering of contacts
+        renderContacts();
+    </script>
+</body>
+</html>
